@@ -1,3 +1,5 @@
+#define _CRT_SECURE_NO_WARNINGS
+
 #include "libchapter_private.h"
 #include "Texture2D.h"
 #include "../3rd_party/tinyxml2.h"

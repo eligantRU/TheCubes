@@ -5,7 +5,7 @@ VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TheCubes", "TheCubes\TheCubes.vcxproj", "{59E0368B-3245-4569-AC25-2E9BC49F36CF}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libchapter", "libchapter\lib.vcxproj", "{99E0535A-FF66-474A-A899-5DB7492D930F}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libchapter", "libchapter\libchapter.vcxproj", "{99E0535A-FF66-474A-A899-5DB7492D930F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
