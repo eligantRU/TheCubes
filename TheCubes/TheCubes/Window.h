@@ -24,11 +24,15 @@ private:
 	void CheckOpenGLVersion();
 	void SetupView(const glm::ivec2 & size);
 
+	void DispatchKeyboardEvent();
+
 	CPhongModelMaterial m_material;
-	CDirectedLightSource m_sunlight;
+	CPositionLightSource m_sunlight;
 	CCamera m_camera;
 	glm::vec2 m_dragPosition;
 	bool m_lineMode = false;
+	
+	CShaderProgram m_program;
 
 	CCubesSystem m_system;
 

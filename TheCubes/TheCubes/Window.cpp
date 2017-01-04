@@ -12,11 +12,13 @@ const glm::vec3 INITIAL_UP_DIRECTION = { 0, 0, 1 };
 
 const glm::vec4 BLACK_RGBA = { 0, 0, 0, 1 };
 const glm::vec4 WHITE_RGBA = { 1, 1, 1, 1 };
-const glm::vec4 GRAY_RGBA = { 0.f, 0.0f, 0.f, 1.f };
+const glm::vec4 GRAY_RGBA = { 0.5f, 0.5f, 0.5f, 1.f };
 
 const float AMBIENT_SCALE = 0.5f;
 const float MATERIAL_SHININESS = 50.f;
-const glm::vec3 SUNLIGHT_DIRECTION = glm::normalize(glm::vec3(-1, -1, -1));
+const glm::vec3 SUNLIGHT_DIRECTION = { -1, -1, -1 };
+
+const float MOVEMENT_SPEED = 0.03f;
 
 void SetupOpenGLState()
 {
@@ -54,6 +56,16 @@ void SetupModelViewProjection(const glm::mat4 & modelView, const glm::mat4 & pro
 	glMatrixMode(GL_MODELVIEW);
 }
 
+void SetShaders(CShaderProgram & program,
+                const std::string & vertexShaderPath, const std::string & fragmentShaderPath)
+{
+	const std::string vertexShader = CFilesystemUtils::LoadFileAsString(vertexShaderPath);
+	const std::string fragmentShader = CFilesystemUtils::LoadFileAsString(fragmentShaderPath);
+	program.CompileShader(vertexShader, ShaderType::Vertex);
+	program.CompileShader(fragmentShader, ShaderType::Fragment);
+	program.Link();
+}
+
 }
 
 CWindowClient::CWindowClient(CWindow & window)
@@ -65,11 +77,10 @@ CWindowClient::CWindowClient(CWindow & window)
 	CheckOpenGLVersion();
 	SetupOpenGLState();
 
-	m_sunlight.SetDirection(SUNLIGHT_DIRECTION);
 	m_sunlight.SetDiffuse(WHITE_RGBA);
 	m_sunlight.SetAmbient(AMBIENT_SCALE * WHITE_RGBA);
 	m_sunlight.SetSpecular(WHITE_RGBA);
-	m_sunlight.SetDirection(INITIAL_VIEW_DIRECTION);
+	m_sunlight.SetPosition(INITIAL_EYE_POSITION);
 
 	m_material.SetShininess(MATERIAL_SHININESS);
 	m_material.SetSpecular(WHITE_RGBA);
@@ -77,17 +88,22 @@ CWindowClient::CWindowClient(CWindow & window)
 	m_material.SetAmbient(AMBIENT_SCALE * GRAY_RGBA);
 
 	m_camera.SetRotationFlag(true);
+
+	SetShaders(m_program, "res/bla.vert", "res/bla.frag");
 }
 
-void CWindowClient::OnUpdateWindow(float dt)
+void CWindowClient::OnUpdateWindow(const float dt)
 {
 	m_camera.Update(dt);
+	DispatchKeyboardEvent();
+
 	SetupView(GetWindow().GetWindowSize());
-	
 	m_sunlight.Setup();
 	m_material.Setup();
 
 	m_system.Update(dt);
+
+	m_program.Use();
 	m_system.Draw();
 }
 
@@ -153,7 +169,7 @@ void CWindowClient::SetupView(const glm::ivec2 & size)
 	const glm::mat4 mv = m_camera.GetViewTransform();
 	glLoadMatrixf(glm::value_ptr(mv));
 
-	const float fieldOfView = glm::radians(179.f);
+	const float fieldOfView = glm::radians(70.f);
 	const float aspect = float(size.x) / float(size.y);
 	const float zNear = 0.01f;
 	const float zFar = 100.f;
@@ -161,4 +177,29 @@ void CWindowClient::SetupView(const glm::ivec2 & size)
 	glMatrixMode(GL_PROJECTION);
 	glLoadMatrixf(glm::value_ptr(proj));
 	glMatrixMode(GL_MODELVIEW);
+}
+
+void CWindowClient::DispatchKeyboardEvent()
+{
+	auto k = 1.f;
+	if (m_keyboardHandler.IsKeyPressed(SDLK_LSHIFT))
+	{
+		k *= 2;
+	}
+	if (m_keyboardHandler.IsKeyPressed(SDLK_w))
+	{
+		m_camera.MoveFrontal(k * MOVEMENT_SPEED);
+	}
+	if (m_keyboardHandler.IsKeyPressed(SDLK_s))
+	{
+		m_camera.MoveFrontal(-k * MOVEMENT_SPEED);
+	}
+	if (m_keyboardHandler.IsKeyPressed(SDLK_a))
+	{
+		m_camera.MoveHorizontal(k * MOVEMENT_SPEED);
+	}
+	if (m_keyboardHandler.IsKeyPressed(SDLK_d))
+	{
+		m_camera.MoveHorizontal(-k * MOVEMENT_SPEED);
+	}
 }
