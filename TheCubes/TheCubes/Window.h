@@ -4,14 +4,15 @@
 #include "Decorators.h"
 #include "Camera.h"
 #include "KeyboardHandler.h"
+#include "CubesSystem.h"
 
 class CWindowClient : public CAbstractWindowClient
 {
 public:
-	CWindowClient(CWindow &window);
+	CWindowClient(CWindow & window);
 
 protected:
-	void OnUpdateWindow(float deltaSeconds) override;
+	void OnUpdateWindow(const float dt) override;
 	void OnKeyDown(const SDL_KeyboardEvent &) override;
 	void OnKeyUp(const SDL_KeyboardEvent &) override;
 
@@ -28,6 +29,8 @@ private:
 	CCamera m_camera;
 	glm::vec2 m_dragPosition;
 	bool m_lineMode = false;
+
+	CCubesSystem m_system;
 
 	CKeyboardHandler m_keyboardHandler;
 };

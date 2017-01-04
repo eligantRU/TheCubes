@@ -79,13 +79,16 @@ CWindowClient::CWindowClient(CWindow & window)
 	m_camera.SetRotationFlag(true);
 }
 
-void CWindowClient::OnUpdateWindow(float deltaSeconds)
+void CWindowClient::OnUpdateWindow(float dt)
 {
-	m_camera.Update(deltaSeconds);
-
+	m_camera.Update(dt);
 	SetupView(GetWindow().GetWindowSize());
+	
 	m_sunlight.Setup();
 	m_material.Setup();
+
+	m_system.Update(dt);
+	m_system.Draw();
 }
 
 void CWindowClient::OnDragBegin(const glm::vec2 & pos)
@@ -125,6 +128,11 @@ void CWindowClient::OnKeyUp(const SDL_KeyboardEvent & event)
 	}
 	SetupLineMode(m_lineMode);
 
+	if (event.keysym.sym == SDLK_SPACE)
+	{
+		m_system.Advance();
+	}
+
 	if (event.keysym.sym == SDLK_ESCAPE)
 	{
 		std::exit(0);
@@ -145,7 +153,7 @@ void CWindowClient::SetupView(const glm::ivec2 & size)
 	const glm::mat4 mv = m_camera.GetViewTransform();
 	glLoadMatrixf(glm::value_ptr(mv));
 
-	const float fieldOfView = glm::radians(90.f);
+	const float fieldOfView = glm::radians(179.f);
 	const float aspect = float(size.x) / float(size.y);
 	const float zNear = 0.01f;
 	const float zFar = 100.f;
